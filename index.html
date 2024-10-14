@@ -2,34 +2,52 @@
 <html lang="en">
     <head>
         <meta http-equiv='X-UA-Compatible' content='IE=edge' />
-        <title>Rhino UI</title>
-        
-        <!-- This is where the styling part --> 
+        <title>GH UI</title>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <!-- Styling -->
         <style>
             body {
-                font-family: Arial, sans-serif;
-                /* background: linear-gradient(to left, #f0f0f0, #a0a0a0); */
+                font-family: 'Roboto', sans-serif;
                 padding: 20px;
             }
 
-            .nav {
+            .logo-container {
+                width: 250px;
+                padding: 10px;
+                text-align: center;
+                border: 1px solid #ddd;
+                margin-bottom: 20px;
+            }
+            .logo-container img {
+                max-width: 100%;
+                height: auto;
+            }   
+
+            .sub-header {
+                font-size: 1.2em;
+                font-weight: normal;
+            }
+            
+            nav {
                 display: flex;
                 gap: 20px;
-                background: #d87b70;
-                padding: 10px;
+                background: #ffffff;
+                border: 1px solid #000000;
+                /* padding: 10px; */
                 border-radius: 10px;
             }
 
             .nav-item {
                 cursor: pointer;
                 padding: 10px;
-                color: #fff;
+                color: #000000;
                 font-weight: bold;
                 text-decoration: none;
             }
 
             .nav-item.active {
-                background-color: #a84940;
+                background-color: #000000;
+                color: #ffffff;
                 border-radius: 5px;
             }
 
@@ -49,32 +67,49 @@
         </style>
     </head>
     <body>
-        <div class="nav">
-            <a class="nav-item active" id="isovist-tab">Isovist</a>
-            <a class="nav-item" id="connectivity-tab">Connectivity</a>
-            <a class="nav-item" id="report-bug-tab">Report Bug</a>
-        </div>
+        <header class="logo-container">
+            <img src="K:\2019\F-19-02_Ferney-Voltaire_Logements_Perraudin\3_AUTRES\B+G_Paramétrisation portiques équivalents\Modèle Rhino+GH\240903_Integrated\UI\EFM-UI\Assets\B+G_Logo_Black 1.jpg" alt="Logo">
+        </header>
 
-        <div class="content" id="content">
-            <p>Runoff limit
-                <input type='range' min='0' max='100' value='50' class='slider' id='runoffLimit'>
-            </p>
-        </div>
+        <main>
+            <section class="title">
+                <h1> Equivalent Frame Modelling </h1>
+            </section>
 
-        <!-- This is where the scripting part --> 
+            <section class="next-div">
+                <h2 class="sub-header"> Calculate reinforcement for stone masonry</h2>
+                <p>The Equivalent Frame Modelling tool calculates the reinforcement requirements for stone masonry buildings based on the equivalent lateral force method in Eurocode 6 and 8.</p>
+            </section>
+
+            <nav>
+                <a class="nav-item active" id="geometry-tab">Geometry</a>
+                <a class="nav-item" id="material-tab">Material</a>
+                <a class="nav-item" id="load-tab">Load</a>
+                <a class="nav-item" id="geotechnic-tab">Geotechnic</a>
+            </nav>
+
+            <section class="content" id="content">
+                <p>Runoff limit
+                    <input type='range' min='0' max='100' value='50' class='slider' id='runoffLimit'>
+                </p>
+            </section>
+        </main>
+
+        <!-- JavaScript -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const content = document.getElementById('content');
 
-                const isovistTab = document.getElementById('isovist-tab');
-                const connectivityTab = document.getElementById('connectivity-tab');
-                const reportBugTab = document.getElementById('report-bug-tab');
+                const tabs = {
+                    geometry: document.getElementById('geometry-tab'),
+                    material: document.getElementById('material-tab'),
+                    load: document.getElementById('load-tab'),
+                    geotechnic: document.getElementById('geotechnic-tab')
+                };
 
-                function setActiveTab(tab) {
-                    isovistTab.classList.remove('active');
-                    connectivityTab.classList.remove('active');
-                    reportBugTab.classList.remove('active');
-                    tab.classList.add('active');
+                function setActiveTab(activeTab) {
+                    Object.values(tabs).forEach(tab => tab.classList.remove('active'));
+                    activeTab.classList.add('active');
                 }
 
                 function attachSliderEvent() {
@@ -89,22 +124,27 @@
                     }
                 }
 
-                isovistTab.addEventListener('click', function() {
-                    setActiveTab(isovistTab);
+                tabs.geometry.addEventListener('click', function() {
+                    setActiveTab(tabs.geometry);
                     content.innerHTML = `<p>Runoff limit
                         <input type='range' min='0' max='100' value='50' class='slider' id='runoffLimit'>
                     </p>`;
                     attachSliderEvent();
                 });
 
-                connectivityTab.addEventListener('click', function() {
-                    setActiveTab(connectivityTab);
-                    content.innerHTML = `<p>Connectivity settings go here.</p>`;
+                tabs.material.addEventListener('click', function() {
+                    setActiveTab(tabs.material);
+                    content.innerHTML = `<p>Material settings go here.</p>`;
                 });
 
-                reportBugTab.addEventListener('click', function() {
-                    setActiveTab(reportBugTab);
-                    content.innerHTML = `<p>Report a bug settings go here.</p>`;
+                tabs.load.addEventListener('click', function() {
+                    setActiveTab(tabs.load);
+                    content.innerHTML = `<p>Load settings go here.</p>`;
+                });
+
+                tabs.geotechnic.addEventListener('click', function() {
+                    setActiveTab(tabs.geotechnic);
+                    content.innerHTML = `<p>Geotechnic settings go here.</p>`;
                 });
 
                 // Attach the initial slider event
