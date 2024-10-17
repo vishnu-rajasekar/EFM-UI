@@ -1,155 +1,284 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta http-equiv='X-UA-Compatible' content='IE=edge' />
-        <title>GH UI</title>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-        <!-- Styling -->
-        <style>
-            body {
-                font-family: 'Roboto', sans-serif;
-                padding: 20px;
-            }
 
-            .logo-container {
-                width: 250px;
-                padding: 10px;
-                text-align: center;
-                border: 1px solid #ddd;
-                margin-bottom: 20px;
-            }
-            .logo-container img {
-                max-width: 100%;
-                height: auto;
-            }   
+<head>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+    <title>GH UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- CSS - Styling -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            padding: 20px;
+        }
 
-            .sub-header {
-                font-size: 1.2em;
-                font-weight: normal;
-            }
-            
-            nav {
-                display: flex;
-                gap: 20px;
-                background: #ffffff;
-                border: 1px solid #000000;
-                /* padding: 10px; */
-                border-radius: 10px;
-            }
+        .logo-container {
+            width: 250px;
+            padding: 10px;
+            text-align: center;
+        }
 
-            .nav-item {
-                cursor: pointer;
-                padding: 10px;
-                color: #000000;
-                font-weight: bold;
-                text-decoration: none;
-            }
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+        }
 
-            .nav-item.active {
-                background-color: #000000;
-                color: #ffffff;
-                border-radius: 5px;
-            }
+        .sub-header {
+            font-size: 1.2em;
+            font-weight: normal;
+        }
 
-            .content {
-                margin-top: 20px;
-            }
+        nav {
+            display: flex;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #000000;
+        }
 
-            .slider {
-                width: 300px;
-                margin-top: 10px;
-            }
+        .nav-item {
+            cursor: pointer;
+            padding: 5px;
+            color: #000000;
+            font-weight: bold;
+            text-decoration: none;
+            flex-grow: 1;
+            flex-shrink: 1;
+            text-align: center;
+            position: relative;
+        }
 
-            p {
-                font-size: 16px;
-                color: #333;
-            }
-        </style>
-    </head>
-    <body>
-        <header class="logo-container">
-            <img src="K:\2019\F-19-02_Ferney-Voltaire_Logements_Perraudin\3_AUTRES\B+G_Paramétrisation portiques équivalents\Modèle Rhino+GH\240903_Integrated\UI\EFM-UI\Assets\B+G_Logo_Black 1.jpg" alt="Logo">
-        </header>
+        .nav-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -1px;
+            width: 1px;
+            background-color: #000000;
+        }
 
-        <main>
-            <section class="title">
-                <h1> Equivalent Frame Modelling </h1>
+        .nav-item:first-child::before {
+            display: none;
+        }
+
+        .nav-item.active {
+            background-color: #000000;
+            color: #ffffff;
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+
+        .button-section {
+            margin-top: 5px;
+            display: flex;
+            justify-content: left;
+        }
+
+        .button-section button {
+            background: #ffffff;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-right: 10px;
+        }
+
+        .button-section button img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .content {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+        }
+
+        button.add-geo {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .slider {
+            width: 300px;
+            margin-top: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="logo-container">
+        <img src="Assets/B+G_Logo_Black_1.jpg" alt="Logo">
+    </header>
+
+    <main>
+        <section class="title">
+            <h1> Equivalent Frame Modelling </h1>
+        </section>
+
+        <section class="next-div">
+            <h2 class="sub-header"> Calculate reinforcement for stone masonry</h2>
+            <p>The Equivalent Frame Modelling tool calculates the reinforcement requirements for stone masonry buildings based on the equivalent lateral force method in Eurocode 6 and 8.</p>
+        </section>
+
+        <!-- Navigation bar -->
+        <nav>
+            <a class="nav-item active" id="geometry-tab">Geometry</a>
+            <a class="nav-item" id="material-tab">Material</a>
+            <a class="nav-item" id="load-tab">Load</a>
+            <a class="nav-item" id="geotechnic-tab">Geotechnic</a>
+        </nav>
+
+        <!-- Content Section -->
+        <section class="content" id="content">
+            <!-- Initial Geometry Content -->
+            <p>Create layers to add geometry here.</p>
+            <section class="button-section">
+                <button id="button-1">
+                    <img src="Assets/Add-Layer-Button.png" alt="Add Layer">
+                    Button 1
+                </button>
+                <button id="button-3">
+                    <img src="Assets/Remove-Layer-Button.png" alt="Remove Layer">
+                    Button 3
+                </button>
             </section>
-
-            <section class="next-div">
-                <h2 class="sub-header"> Calculate reinforcement for stone masonry</h2>
-                <p>The Equivalent Frame Modelling tool calculates the reinforcement requirements for stone masonry buildings based on the equivalent lateral force method in Eurocode 6 and 8.</p>
+            <section class="geometry-table-section">
+                <table id="geometry-table">
+                    <thead>
+                        <tr>
+                            <th>Geometry Name</th>
+                            <th>Parameter Value</th>
+                            <th>Add Geometry</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" id="geometry-name" placeholder="Enter name" /></td>
+                            <td><input type="number" id="geometry-thickness" placeholder="Enter thickness" /></td>
+                            <td><button class="add-geo">Add Geo</button></td>
+                        </tr>
+                    </tbody>
+                </table>
             </section>
+        </section>
+    </main>
 
-            <nav>
-                <a class="nav-item active" id="geometry-tab">Geometry</a>
-                <a class="nav-item" id="material-tab">Material</a>
-                <a class="nav-item" id="load-tab">Load</a>
-                <a class="nav-item" id="geotechnic-tab">Geotechnic</a>
-            </nav>
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const content = document.getElementById('content');
 
-            <section class="content" id="content">
-                <p>Runoff limit
-                    <input type='range' min='0' max='100' value='50' class='slider' id='runoffLimit'>
-                </p>
-            </section>
-        </main>
+            const tabs = {
+                geometry: document.getElementById('geometry-tab'),
+                material: document.getElementById('material-tab'),
+                load: document.getElementById('load-tab'),
+                geotechnic: document.getElementById('geotechnic-tab')
+            };
 
-        <!-- JavaScript -->
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const content = document.getElementById('content');
+            function setActiveTab(activeTab) {
+                Object.values(tabs).forEach(tab => tab.classList.remove('active'));
+                activeTab.classList.add('active');
+            }
 
-                const tabs = {
-                    geometry: document.getElementById('geometry-tab'),
-                    material: document.getElementById('material-tab'),
-                    load: document.getElementById('load-tab'),
-                    geotechnic: document.getElementById('geotechnic-tab')
-                };
-
-                function setActiveTab(activeTab) {
-                    Object.values(tabs).forEach(tab => tab.classList.remove('active'));
-                    activeTab.classList.add('active');
+            function attachSliderEvent() {
+                const runoffSlider = document.getElementById('runoffLimit');
+                if (runoffSlider) {
+                    runoffSlider.addEventListener('input', function () {
+                        const value = runoffSlider.value;
+                        window.location.href = `greenscenario:slider?${value}`;
+                    });
                 }
+            }
 
-                function attachSliderEvent() {
-                    const runoffSlider = document.getElementById('runoffLimit');
-                    if (runoffSlider) {
-                        runoffSlider.addEventListener('input', function() {
-                            let value = runoffSlider.value;
-                            window.location.href = 'greenscenario:runofflimit?' + value;
-                        });
-                    } else {
-                        console.error('Slider element not found');
-                    }
-                }
+            function attachAddGeoEvent() {
+                document.querySelectorAll('.add-geo').forEach(button => {
+                    button.addEventListener('click', function () {
+                        const geometryName = document.getElementById('geometry-name').value;
+                        const geometryThickness = parseFloat(document.getElementById('geometry-thickness').value);
 
-                tabs.geometry.addEventListener('click', function() {
-                    setActiveTab(tabs.geometry);
-                    content.innerHTML = `<p>Runoff limit
-                        <input type='range' min='0' max='100' value='50' class='slider' id='runoffLimit'>
-                    </p>`;
-                    attachSliderEvent();
+                        if (geometryName && !isNaN(geometryThickness)) {
+                            window.location.href = `greenscenario:addgeo?${geometryName},${geometryThickness}`;
+                        } else {
+                            alert("Please fill all fields to create an element.");
+                        }
+                    });
                 });
+            }
 
-                tabs.material.addEventListener('click', function() {
-                    setActiveTab(tabs.material);
-                    content.innerHTML = `<p>Material settings go here.</p>`;
-                });
-
-                tabs.load.addEventListener('click', function() {
-                    setActiveTab(tabs.load);
-                    content.innerHTML = `<p>Load settings go here.</p>`;
-                });
-
-                tabs.geotechnic.addEventListener('click', function() {
-                    setActiveTab(tabs.geotechnic);
-                    content.innerHTML = `<p>Geotechnic settings go here.</p>`;
-                });
-
-                // Attach the initial slider event
-                attachSliderEvent();
+            tabs.geometry.addEventListener('click', function () {
+                setActiveTab(tabs.geometry);
+                content.innerHTML = `
+                    <p>Create layers to add geometry here.</p>
+                    <section class="button-section">
+                        <button id="button-1">
+                            <img src="Assets/Add-Layer-Button.png" alt="Add Layer">
+                            Button 1
+                        </button>
+                        <button id="button-3">
+                            <img src="Assets/Remove-Layer-Button.png" alt="Remove Layer">
+                            Button 3
+                        </button>
+                    </section>
+                    <section class="geometry-table-section">
+                        <table id="geometry-table">
+                            <thead>
+                                <tr>
+                                    <th>Geometry Name</th>
+                                    <th>Parameter Value</th>
+                                    <th>Add Geometry</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" id="geometry-name" placeholder="Enter name" /></td>
+                                    <td><input type="number" id="geometry-thickness" placeholder="Enter thickness" /></td>
+                                    <td><button class="add-geo">Add Geo</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+                `;
+                attachAddGeoEvent(); // Attach event for "Add Geo" button
             });
-        </script>
-    </body>
+
+            tabs.material.addEventListener('click', function () {
+                setActiveTab(tabs.material);
+                content.innerHTML = `<p>Material settings go here.</p>`;
+            });
+
+            tabs.load.addEventListener('click', function () {
+                setActiveTab(tabs.load);
+                content.innerHTML = `<p>Runoff limit
+                    <input type='range' min='0' max='100' value='50' class='slider' id='runoffLimit'>
+                </p>`;
+                attachSliderEvent(); // Attach slider event after changing content
+            });
+
+            tabs.geotechnic.addEventListener('click', function () {
+                setActiveTab(tabs.geotechnic);
+                content.innerHTML = `<p>Geotechnic settings go here.</p>`;
+            });
+
+            // Attach the initial add geometry button event and slider event
+            attachAddGeoEvent();
+            attachSliderEvent();
+        });
+    </script>
+</body>
+
 </html>
