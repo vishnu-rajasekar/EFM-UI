@@ -145,18 +145,7 @@
 
         <!-- Content Section -->
         <section class="content" id="content">
-            <!-- Initial Geometry Content -->
-            <p>Create layers to add geometry here.</p>
-            <section class="button-section">
-                <button id="button-1">
-                    <img src="Assets/Add-Layer-Button.png" alt="Add Layer">
-                    Button 1
-                </button>
-                <button id="button-3">
-                    <img src="Assets/Remove-Layer-Button.png" alt="Remove Layer">
-                    Button 3
-                </button>
-            </section>
+            <!-- Geometry Content -->
             <section class="geometry-table-section">
                 <table id="geometry-table">
                     <thead>
@@ -174,6 +163,13 @@
                         </tr>
                     </tbody>
                 </table>
+            </section>
+
+            <!-- Load Content with Slider -->
+            <section id="load-content" style="display: none;">
+                <p>Runoff limit
+                    <input type="range" min="0" max="100" value="50" class="slider" id="runoffLimit">
+                </p>
             </section>
         </section>
     </main>
@@ -199,20 +195,22 @@
                 const runoffSlider = document.getElementById('runoffLimit');
                 if (runoffSlider) {
                     runoffSlider.addEventListener('input', function () {
-                        const value = runoffSlider.value;
-                        window.location.href = `greenscenario:slider?${value}`;
+                        const value = runoffSlider.value; // Get the current value of the slider
+                        window.location.href = `sliderupdate:slider?${value}`; // Custom URI to communicate with the Python script
                     });
+                } else {
+                    console.error('Slider element not found');
                 }
             }
 
             function attachAddGeoEvent() {
                 document.querySelectorAll('.add-geo').forEach(button => {
                     button.addEventListener('click', function () {
-                        const geometryName = document.getElementById('geometry-name').value;
-                        const geometryThickness = parseFloat(document.getElementById('geometry-thickness').value);
+                        const geometryName = document.getElementById('geometry-name').value; // Get the name from the text input
+                        const geometryThickness = parseFloat(document.getElementById('geometry-thickness').value); // Get the thickness value
 
                         if (geometryName && !isNaN(geometryThickness)) {
-                            window.location.href = `greenscenario:addgeo?${geometryName},${geometryThickness}`;
+                            window.location.href = `geometryupdate:addgeo?${geometryName},${geometryThickness}`; // Custom URI to communicate with the Python script
                         } else {
                             alert("Please fill all fields to create an element.");
                         }
@@ -220,20 +218,11 @@
                 });
             }
 
+
+            // Event listeners for navigation tabs
             tabs.geometry.addEventListener('click', function () {
                 setActiveTab(tabs.geometry);
                 content.innerHTML = `
-                    <p>Create layers to add geometry here.</p>
-                    <section class="button-section">
-                        <button id="button-1">
-                            <img src="Assets/Add-Layer-Button.png" alt="Add Layer">
-                            Button 1
-                        </button>
-                        <button id="button-3">
-                            <img src="Assets/Remove-Layer-Button.png" alt="Remove Layer">
-                            Button 3
-                        </button>
-                    </section>
                     <section class="geometry-table-section">
                         <table id="geometry-table">
                             <thead>
@@ -256,17 +245,21 @@
                 attachAddGeoEvent(); // Attach event for "Add Geo" button
             });
 
+            tabs.load.addEventListener('click', function () {
+                setActiveTab(tabs.load);
+                content.innerHTML = `
+                    <section id="load-content">
+                        <p>Runoff limit
+                            <input type="range" min="0" max="100" value="50" class="slider" id="runoffLimit">
+                        </p>
+                    </section>
+                `;
+                attachSliderEvent(); // Attach slider event after changing content
+            });
+
             tabs.material.addEventListener('click', function () {
                 setActiveTab(tabs.material);
                 content.innerHTML = `<p>Material settings go here.</p>`;
-            });
-
-            tabs.load.addEventListener('click', function () {
-                setActiveTab(tabs.load);
-                content.innerHTML = `<p>Runoff limit
-                    <input type='range' min='0' max='100' value='50' class='slider' id='runoffLimit'>
-                </p>`;
-                attachSliderEvent(); // Attach slider event after changing content
             });
 
             tabs.geotechnic.addEventListener('click', function () {
@@ -274,7 +267,7 @@
                 content.innerHTML = `<p>Geotechnic settings go here.</p>`;
             });
 
-            // Attach the initial add geometry button event and slider event
+            // Attach initial events
             attachAddGeoEvent();
             attachSliderEvent();
         });
