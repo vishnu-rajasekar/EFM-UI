@@ -1,0 +1,120 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    padding: 20px;
+    background-color: white;
+}
+
+.logo-container {
+    width: 250px;
+    padding: 10px;
+    position: relative; /* has to be position relative for left to work, or you could just do margin-left: -50px; too */
+    left: -25px;
+
+}
+
+.logo-container img {
+    max-width: 100%;
+    height: auto;
+
+}
+
+.sub-header {
+    font-size: 1.2em;
+    font-weight: normal;
+}
+
+nav {
+    display: flex;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #000000;
+}
+
+.nav-item {
+    cursor: pointer;
+    padding: 5px;
+    color: #000000;
+    font-weight: bold;
+    text-decoration: none;
+    flex-grow: 1;
+    flex-shrink: 1;
+    text-align: center;
+    position: relative;
+}
+
+.nav-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1px;
+    width: 1px;
+    background-color: #000000;
+}
+
+.nav-item:first-child::before {
+    display: none;
+}
+
+.nav-item.active {
+    background-color: #000000;
+    color: #ffffff;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.button-section {
+    margin-top: 5px;
+    display: flex;
+    justify-content: left;
+}
+
+.button-section button {
+    background: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-right: 1px;
+}
+
+.button-section button img {
+    width: 15px;
+    height: 15px;
+}
+
+.content {
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1px;
+}
+
+th, td {
+    border: 1px solid #000;
+    text-align: center;
+}
+
+button.add-geo {
+    background: #ffffff;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.slider {
+    width: 300px;
+    margin-top: 0px;
+}
+
+.active-row {
+    background-color: #dfdfdf;
+}

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+    <title>GH UI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- CSS - Styling -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+
+        .logo-container {
+            width: 250px;
+
+            text-align: center;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .sub-header {
+            font-size: 1.2em;
+            font-weight: normal;
+        }
+
+        nav {
+            display: flex;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #000000;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 5px;
+            color: #000000;
+            font-weight: bold;
+            text-decoration: none;
+            flex-grow: 1;
+            flex-shrink: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .nav-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -1px;
+            width: 1px;
+            background-color: #000000;
+        }
+
+        .nav-item:first-child::before {
+            display: none;
+        }
+
+        .nav-item.active {
+            background-color: #000000;
+            color: #ffffff;
+            flex-grow: 1;
+            flex-shrink: 1;
+        }
+
+        .button-section {
+            margin-top: 5px;
+            display: flex;
+            justify-content: left;
+        }
+
+        .button-section button {
+            background: #ffffff;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-right: 2px;
+        }
+
+        .button-section button img {
+            width: 15px;
+            height: 15px;
+        }
+
+        .content {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2px;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            text-align: center;
+            word-wrap: break-word;
+        }
+        input[type="text"], input[type="number"] {
+            width: 90%; /* Responsive width to keep inputs from overflowing */
+            box-sizing: border-box; /* Includes padding in the width calculation */
+            padding: 5px;
+        }
+
+        tr.active-row {
+            background-color: #bbbbbb; /* Highlight color */
+        }
+
+        button.add-geo {
+            background: #ffffff;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .slider {
+            width: 300px;
+            margin-top: 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="logo-container">
+        <img src="Assets/B+G_Logo_Black 1 1.png" alt="Logo">
+    </header>
+
+    <main>
+        <section class="title">
+            <h1> Equivalent Frame Modelling </h1>
+        </section>
+
+        <section class="next-div">
+            <h2 class="sub-header"> Calculate reinforcement for stone masonry</h2>
+            <p>The Equivalent Frame Modelling tool calculates the reinforcement requirements for stone masonry buildings based on the equivalent lateral force method in Eurocode 6 and 8.</p>
+        </section>
+
+        <!-- Navigation bar -->
+        <nav>
+            <a class="nav-item active" id="geometry-tab">Geometry</a>
+            <a class="nav-item" id="material-tab">Material</a>
+            <a class="nav-item" id="load-tab">Load</a>
+            <a class="nav-item" id="geotechnic-tab">Geotechnic</a>
+        </nav>
+
+        <!-- Content Section -->
+        <section class="content" id="content">
+            <!-- Initial Geometry Content -->
+            <p>Create layers to add geometry here.</p>
+            
+            <section class="geometry-table-section">
+                <section class="button-section">
+                    <button id="button-1">
+                        <img src="Assets/Add-Layer-Button.png" alt="Add Layer">
+                        Add Row
+                    </button>
+                    <button id="button-3">
+                        <img src="Assets/Remove-Layer-Button.png" alt="Remove Layer">
+                        Remove Row
+                    </button>
+                </section>
+                <table id="geometry-table">
+                    <thead>
+                        <tr>
+                            <th>Geometry Name</th>
+                            <th>Parameter Value</th>
+                            <th>Add Geometry</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="text" class="geometry-name" placeholder="Enter name" /></td>
+                            <td><input type="number" class="geometry-thickness" placeholder="Enter thickness" /></td>
+                            <td><button class="add-geo">Add Geo</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </section>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const content = document.getElementById('content');
+    
+            const tabs = {
+                geometry: document.getElementById('geometry-tab'),
+                material: document.getElementById('material-tab'),
+                load: document.getElementById('load-tab'),
+                geotechnic: document.getElementById('geotechnic-tab')
+            };
+    
+            function setActiveTab(activeTab) {
+                Object.values(tabs).forEach(tab => tab.classList.remove('active'));
+                activeTab.classList.add('active');
+            }
+    
+            // Attach events to buttons for adding and removing rows
+            function attachButtonEvents() {
+                // Attach click event to add row button
+                document.getElementById('button-1').addEventListener('click', function () {
+                    addTableRow();
+                });
+    
+                // Attach click event to remove row button
+                document.getElementById('button-3').addEventListener('click', function () {
+                    removeActiveRow();
+                });
+            }
+    
+            // Save the current state of the table to sc.sticky
+            function saveTableState() {
+                const rows = Array.from(document.querySelectorAll('#geometry-table tbody tr'));
+                const tableState = rows.map(row => {
+                    const nameInput = row.querySelector('.geometry-name').value;
+                    const thicknessInput = row.querySelector('.geometry-thickness').value;
+                    return { name: nameInput, thickness: thicknessInput };
+                });
+                window.location.href = `savetable:state?${JSON.stringify(tableState)}`; // Communicate with Python to save table state
+            }
+    
+            // Load the table state from sticky data
+            function loadTableState(tableState) {
+                const tableBody = document.querySelector('#geometry-table tbody');
+                tableBody.innerHTML = ""; // Clear existing table rows
+                tableState.forEach(rowData => {
+                    addTableRow(rowData.name, rowData.thickness);
+                });
+            }
+    
+            // Add a row to the geometry table
+            function addTableRow(name = "", thickness = "") {
+                const tableBody = document.querySelector('#geometry-table tbody');
+                const newRow = tableBody.insertRow();
+                let nameCell = newRow.insertCell(0);
+                let thicknessCell = newRow.insertCell(1);
+                let buttonCell = newRow.insertCell(2);
+    
+                nameCell.innerHTML = `<input type="text" value="${name}" class="geometry-name" placeholder="Enter name" />`;
+                thicknessCell.innerHTML = `<input type="number" value="${thickness}" class="geometry-thickness" placeholder="Enter thickness" />`;
+                buttonCell.innerHTML = `<button class="add-geo">Add Geo</button>`;
+    
+                // Reattach click event for the Add Geo button
+                buttonCell.querySelector('.add-geo').addEventListener('click', function () {
+                    alert("Add Geo button clicked for " + name);
+                    saveTableState(); // Save table state after clicking Add Geo
+                });
+    
+                attachRowClickEvents(); // Attach click events to new rows for row selection
+                saveTableState(); // Save the table state after adding a row
+            }
+    
+            // Remove the active row from the table
+            function removeActiveRow() {
+                const activeRow = document.querySelector('.active-row');
+                if (activeRow) {
+                    activeRow.remove();
+                    saveTableState(); // Save the table state after removing a row
+                } else {
+                    alert("Please select a row to remove.");
+                }
+            }
+    
+            // Attach event listener to highlight a row when clicked
+            function attachRowClickEvents() {
+                document.querySelectorAll('#geometry-table tbody tr').forEach(row => {
+                    row.addEventListener('click', function () {
+                        document.querySelectorAll('#geometry-table tbody tr').forEach(r => r.classList.remove('active-row'));
+                        row.classList.add('active-row');
+                    });
+                });
+            }
+    
+            // Attach the slider event
+            function attachSliderEvent() {
+                const runoffSlider = document.getElementById('runoffLimit');
+                if (runoffSlider) {
+                    runoffSlider.addEventListener('input', function () {
+                        const value = runoffSlider.value; // Get the current value of the slider
+                        window.location.href = `sliderupdate:slider?${value}`; // Custom URI to communicate with the Python script
+                    });
+                } else {
+                    console.error('Slider element not found');
+                }
+            }
+    
+            // Event listeners for navigation tabs
+            tabs.geometry.addEventListener('click', function () {
+                setActiveTab(tabs.geometry);
+                content.innerHTML = `
+                    <p>Create layers to add geometry here.</p>
+                    <section class="button-section">
+                        <button id="button-1">
+                            <img src="Assets/Add-Layer-Button.png" alt="Add Layer"> Add Row
+                        </button>
+                        <button id="button-3">
+                            <img src="Assets/Remove-Layer-Button.png" alt="Remove Layer"> Remove Row
+                        </button>
+                    </section>
+                    <section class="geometry-table-section">
+                        <table id="geometry-table">
+                            <thead>
+                                <tr>
+                                    <th>Geometry Name</th>
+                                    <th>Parameter Value</th>
+                                    <th>Add Geometry</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Rows will be populated dynamically -->
+                            </tbody>
+                        </table>
+                    </section>
+                `;
+                // Load the table state from sc.sticky through a custom URL scheme (handled by Python)
+                window.location.href = "loadtable:state";
+    
+                // Reattach button events after rendering the content
+                attachButtonEvents();
+            });
+    
+            tabs.load.addEventListener('click', function () {
+                setActiveTab(tabs.load);
+                content.innerHTML = `
+                    <section id="load-content">
+                        <p>Runoff limit
+                            <input type="range" min="0" max="100" value="50" class="slider" id="runoffLimit">
+                        </p>
+                    </section>
+                `;
+                attachSliderEvent(); // Attach slider event after changing content
+            });
+    
+            tabs.material.addEventListener('click', function () {
+                setActiveTab(tabs.material);
+                content.innerHTML = `<p>Material settings go here.</p>`;
+            });
+    
+            tabs.geotechnic.addEventListener('click', function () {
+                setActiveTab(tabs.geotechnic);
+                content.innerHTML = `<p>Geotechnic settings go here.</p>`;
+            });
+    
+            // Attach initial events
+            attachButtonEvents();
+            attachSliderEvent();
+        });
+    
+        // JavaScript function called from Python to load the table state
+        function loadTableStateFromSticky(stateString) {
+            const tableState = JSON.parse(stateString);
+            loadTableState(tableState);
+        }
+    </script>
+    
+    
+    
+    
+    
+</body>
+
+</html>
