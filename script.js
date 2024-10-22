@@ -1,11 +1,23 @@
 document.addEventListener('DOMContentLoaded', function () {
-
+    console.log("Page Loaded"); // To confirm when the document is loaded
     const content = document.getElementById('content');
     const geometryContent = document.getElementById('geometry-content');
     const materialContent = document.getElementById('material-content');
     const loadContent = document.getElementById('load-content');
     const geotechnicContent = document.getElementById('geotechnic-content');
     const historyStack = []; // Stack to store history of table states for undo functionality
+
+    const sliderIds = ["slider1", "slider255"];
+    sliderIds.forEach(function (id) {
+        const storedValue = localStorage.getItem(id);
+        if (storedValue !== null) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.value = storedValue;
+            }
+        }
+    });
+
 
     const tabs = {
         geometry: document.getElementById('geometry-tab'),
@@ -153,17 +165,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function attachSliderEvent() {
-        const runoffSlider = document.getElementById('runoffLimit');
-        if (runoffSlider) {
-            runoffSlider.addEventListener('input', function () {
-                const value = runoffSlider.value; // Get the current value of the slider
-                window.location.href = `sliderupdate:slider?${value}`; // Custom URI to communicate with the Python script
+    // function attachSliderEvent() {
+    //     const runoffSlider = document.getElementById('runoffLimit');
+    //     if (runoffSlider) {
+    //         runoffSlider.addEventListener('input', function () {
+    //             const value = runoffSlider.value; // Get the current value of the slider
+    //             window.location.href = `sliderupdate:slider?${value}`; // Custom URI to communicate with the Python script
+    //         });
+    //     } else {
+    //         console.error('Slider element not found');
+    //     }
+    // }
+
+    // Add event listeners to store values when they change
+    sliderIds.forEach(function (id) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', function () {
+                localStorage.setItem(id, element.value);
+                window.location.href = `sliderupdate:slider?${id}=${element.value}`;
             });
-        } else {
-            console.error('Slider element not found');
         }
-    }
+    });
 
     // Attach button events to add and remove rows
     document.getElementById('button-1').addEventListener('click', function () {
@@ -180,28 +203,6 @@ document.addEventListener('DOMContentLoaded', function () {
             alert("Please select a row to remove.");
         }
     });
-    
-    // function setSliderValueFromUrl() {
-    //     const urlParams = new URLSearchParams(window.location.search);
-    //     const sliderValue = urlParams.get('slider_value');
-
-    //     if (sliderValue !== null) {
-    //         const runoffSlider = document.getElementById('runoffLimit');
-    //         if (runoffSlider) {
-    //             runoffSlider.value = sliderValue;  // Set the slider to the provided value
-    //         }
-    //     }
-    // }
-
-    // // Run this function when the document is fully loaded
-    // setSliderValueFromUrl();
-
-    // function setSliderValue(value) {
-    //     const runoffSlider = document.getElementById('runoffLimit');
-    //     if (runoffSlider) {
-    //         runoffSlider.value = value;  // Set the slider to the provided value
-    //     }
-    // }
     
     // Attach the initial events
     attachTabEventListeners();
