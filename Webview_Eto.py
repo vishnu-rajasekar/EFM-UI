@@ -13,6 +13,9 @@ class Element:
         self.thickness = thickness
 
 class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
+    
+    slider_values = {}
+
     def RunScript(self, get_inputs, path):
         # Define a standalone function to recompute Grasshopper solution
         def schedule_recompute():
@@ -81,11 +84,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
 
             def on_document_loading(self, sender, e):
 
-                # Inject JavaScript here after the HTML is fully loaded
-                
-
-
-
                 # Intercept custom scheme (e.g., "savetable")
                 if e.Uri.Scheme == "savetable":
                     e.Cancel = True  # Prevent actual navigation
@@ -102,7 +100,8 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
                 if e.Uri.Scheme == "sliderupdate":
                     e.Cancel = True  # Prevent actual navigation
                     value = e.Uri.Query.strip('?')  # Get the value from the query string
-                    sc.sticky["slider_value"] = float(value)
+                    slider_id, slider_value = value.split('=')
+                    sc.sticky[slider_id] = float(slider_value)
                     schedule_recompute()
 
                 if e.Uri.Scheme == "geometryupdate":
@@ -156,9 +155,7 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
         if get_inputs:
             if 'form' not in sc.sticky or not isinstance(sc.sticky['form'], WebviewSliderDialog) or not sc.sticky['form'].Visible:
                 
-                slider_values = {
-                    "slider1": sc.sticky.get('slider1_value', None),
-                }
+                
 
                 form = WebviewSliderDialog()
                 sc.sticky['form'] = form
@@ -167,7 +164,10 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
             
 
         # Ensure output 'a' is updated after running the UI
-        value = sc.sticky.get('slider1_value', None)
+        #value = sc.sticky.get('slider_value', None)
+        
+        #value = slider_values["slider1"]
+        slider1_value = sc.sticky.get('slider1', None)
 
         elements = sc.sticky.get('elements', [])
         element_names = [element.name for element in elements]
@@ -177,6 +177,6 @@ class MyComponent(Grasshopper.Kernel.GH_ScriptInstance):
                 element_geo.append(geo)
 
         element_thik = [element.thickness for element in elements]
+        
 
-
-        return value, element_names, element_geo, element_thik
+        return slider1_value, element_names, element_geo, element_thik
