@@ -66,13 +66,23 @@
             <div id="material-content" style="display: none;">
                 <p>Material settings go here.</p>
             </div>
-            <div id="load-content" style="display: none;">
+            <!-- <div id="load-content" style="display: none;">
                 <p>Q
                     <input type="range" min="0" max="100" class="slider" id="slider1">
                 </p>
                 <p>G1
                     <input type="range" min="0" max="100" class="slider" id="slider255">
                 </p>
+            </div> -->
+            <div id="load-content" style="display: none;">
+                <div>
+                    <label for="slider1">Q:</label>
+                    <input type="range" id="slider1" min="0" max="100" />
+                </div>
+                <div>
+                    <label for="slider255">G1:</label>
+                    <input type="range" id="slider255" min="0" max="100" />
+                </div>
             </div>
             <div id="geotechnic-content" style="display: none;">
                 <p>Geotechnic settings go here.</p>
@@ -83,4 +93,4 @@
     <script src="script.js"></script> <!-- Link to external JavaScript file -->
 </body>
 
-</html>
+</html

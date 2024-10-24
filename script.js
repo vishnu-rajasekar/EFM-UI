@@ -7,18 +7,74 @@ document.addEventListener('DOMContentLoaded', function () {
     const geotechnicContent = document.getElementById('geotechnic-content');
     const historyStack = []; // Stack to store history of table states for undo functionality
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // SLIDER 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    // Get URL parameters for initial slider values
+    // const urlParams = new URLSearchParams(window.location.search);
     const sliderIds = ["slider1", "slider255"];
+
+    // // Initialize sliders with default values or from URL params
+    // sliderIds.forEach(function (id) {
+    //     const element = document.getElementById(id);
+    //     if (element) {
+    //         // Get initial value from URL parameters or default to 75
+    //         const initialValue = urlParams.get(id) || 2;
+    //         element.value = initialValue;
+    //         console.log(`Setting initial value for ${id}: ${initialValue}`);
+    //     } else {
+    //         console.error(`Slider with ID ${id} not found.`);
+    //     }
+    // });
+
+    // // Add event listeners for slider value changes
+    // sliderIds.forEach(function (id) {
+    //     const element = document.getElementById(id);
+    //     if (element) {
+    //         element.addEventListener('input', function () {
+    //             // When the slider changes, update the value in Rhino via the custom URI scheme
+    //             window.location.href = `sliderupdate:slider?${id}=${element.value}`;
+    //         });
+    //     }
+    // });
+
+    
     sliderIds.forEach(function (id) {
-        const storedValue = localStorage.getItem(id);
-        if (storedValue !== null) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.value = storedValue;
+        const element = document.getElementById(id);
+        if (element) {
+            // Retrieve stored value or set to default if not found
+            let storedValue = localStorage.getItem(id);
+            if (storedValue === null) {
+                storedValue = 95;  // Default value
+                localStorage.setItem(id, storedValue);  // Set the default value to localStorage
+                console.log(`Setting initial value for ${id} to default: ${storedValue}`);
+            } else {
+                console.log(`Setting ${id} to stored value: ${storedValue}`);
             }
+
+            element.value = storedValue;  // Set the slider to the retrieved/stored value
+        } else {
+            console.error(`Slider with ID ${id} not found.`);
         }
     });
 
-
+    // Add event listeners to store values when they change
+    sliderIds.forEach(function (id) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', function () {
+                console.log(`Updating ${id} to value: ${element.value}`);
+                localStorage.setItem(id, element.value);
+                window.location.href = `sliderupdate:slider?${id}=${element.value}`;
+            });
+        }
+    });
+    
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // TAB 
+    ///////////////////////////////////////////////////////////////////////////////////////////
     const tabs = {
         geometry: document.getElementById('geometry-tab'),
         material: document.getElementById('material-tab'),
@@ -38,35 +94,88 @@ document.addEventListener('DOMContentLoaded', function () {
         geotechnicContent.style.display = 'none';
     }
 
-    function saveTableStateToHistory() {
-        const rows = Array.from(document.querySelectorAll('#geometry-table tbody tr'));
-        const tableState = rows.map(row => {
-            const nameInput = row.querySelector('.geometry-name').value;
-            const thicknessInput = row.querySelector('.geometry-thickness').value;
-            return { name: nameInput, thickness: thicknessInput };
+    // Function to attach tab click event listeners
+    function attachTabEventListeners() {
+        tabs.geometry.addEventListener('click', function () {
+            setActiveTab(tabs.geometry);
+            hideAllContent();
+            geometryContent.style.display = 'block';
+            window.location.href = "loadtable:state"; // Request Python to provide table state
         });
-        historyStack.push(JSON.stringify(tableState));
+
+        tabs.material.addEventListener('click', function () {
+            setActiveTab(tabs.material);
+            hideAllContent();
+            materialContent.style.display = 'block';
+        });
+
+        tabs.load.addEventListener('click', function () {
+            setActiveTab(tabs.load);
+            hideAllContent();
+            loadContent.style.display = 'block';
+            // attachSliderEvent(); // Attach slider event after changing content
+        });
+
+        tabs.geotechnic.addEventListener('click', function () {
+            setActiveTab(tabs.geotechnic);
+            hideAllContent();
+            geotechnicContent.style.display = 'block';
+        });
     }
 
-    function saveTableStateToSticky() {
-        const rows = Array.from(document.querySelectorAll('#geometry-table tbody tr'));
-        const tableState = rows.map(row => {
-            const nameInput = row.querySelector('.geometry-name').value;
-            const thicknessInput = row.querySelector('.geometry-thickness').value;
-            return { name: nameInput, thickness: thicknessInput };
-        });
-        window.location.href = `savetable:state?${JSON.stringify(tableState)}`;
-    }
+    // Attach button events to add and remove rows
+    document.getElementById('button-1').addEventListener('click', function () {
+        addTableRow();
+    });
 
-    function loadTableStateFromSticky(stateString) {
-        const tableState = JSON.parse(stateString);
-        const tableBody = document.querySelector('#geometry-table tbody');
-        tableBody.innerHTML = ""; // Clear existing rows
-        tableState.forEach(rowData => {
-            addTableRow(rowData.name, rowData.thickness);
-        });
-    }
+    document.getElementById('button-3').addEventListener('click', function () {
+        const activeRow = document.querySelector('.active-row');
+        if (activeRow) {
+            activeRow.remove();
+            saveTableStateToHistory();
+            saveTableStateToSticky();
+        } else {
+            alert("Please select a row to remove.");
+        }
+    });
 
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // TABLE HISTORY
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
+    // function saveTableStateToHistory() {
+    //     const rows = Array.from(document.querySelectorAll('#geometry-table tbody tr'));
+    //     const tableState = rows.map(row => {
+    //         const nameInput = row.querySelector('.geometry-name').value;
+    //         const thicknessInput = row.querySelector('.geometry-thickness').value;
+    //         return { name: nameInput, thickness: thicknessInput };
+    //     });
+    //     historyStack.push(JSON.stringify(tableState));
+    // }
+
+    // function saveTableStateToSticky() {
+    //     const rows = Array.from(document.querySelectorAll('#geometry-table tbody tr'));
+    //     const tableState = rows.map(row => {
+    //         const nameInput = row.querySelector('.geometry-name').value;
+    //         const thicknessInput = row.querySelector('.geometry-thickness').value;
+    //         return { name: nameInput, thickness: thicknessInput };
+    //     });
+    //     window.location.href = `savetable:state?${JSON.stringify(tableState)}`;
+    // }
+
+    // function loadTableStateFromSticky(stateString) {
+    //     const tableState = JSON.parse(stateString);
+    //     const tableBody = document.querySelector('#geometry-table tbody');
+    //     tableBody.innerHTML = ""; // Clear existing rows
+    //     tableState.forEach(rowData => {
+    //         addTableRow(rowData.name, rowData.thickness);
+    //     });
+    // }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // TABLE HISTORY
+    ///////////////////////////////////////////////////////////////////////////////////////////
     function addTableRow(name = "", thickness = "") {
         const tableBody = document.querySelector('#geometry-table tbody');
         const newRow = tableBody.insertRow();
@@ -136,77 +245,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Function to attach tab click event listeners
-    function attachTabEventListeners() {
-        tabs.geometry.addEventListener('click', function () {
-            setActiveTab(tabs.geometry);
-            hideAllContent();
-            geometryContent.style.display = 'block';
-            window.location.href = "loadtable:state"; // Request Python to provide table state
-        });
-
-        tabs.material.addEventListener('click', function () {
-            setActiveTab(tabs.material);
-            hideAllContent();
-            materialContent.style.display = 'block';
-        });
-
-        tabs.load.addEventListener('click', function () {
-            setActiveTab(tabs.load);
-            hideAllContent();
-            loadContent.style.display = 'block';
-            attachSliderEvent(); // Attach slider event after changing content
-        });
-
-        tabs.geotechnic.addEventListener('click', function () {
-            setActiveTab(tabs.geotechnic);
-            hideAllContent();
-            geotechnicContent.style.display = 'block';
-        });
-    }
-
-    // function attachSliderEvent() {
-    //     const runoffSlider = document.getElementById('runoffLimit');
-    //     if (runoffSlider) {
-    //         runoffSlider.addEventListener('input', function () {
-    //             const value = runoffSlider.value; // Get the current value of the slider
-    //             window.location.href = `sliderupdate:slider?${value}`; // Custom URI to communicate with the Python script
-    //         });
-    //     } else {
-    //         console.error('Slider element not found');
-    //     }
-    // }
-
-    // Add event listeners to store values when they change
-    sliderIds.forEach(function (id) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('input', function () {
-                localStorage.setItem(id, element.value);
-                window.location.href = `sliderupdate:slider?${id}=${element.value}`;
-            });
-        }
-    });
-
-    // Attach button events to add and remove rows
-    document.getElementById('button-1').addEventListener('click', function () {
-        addTableRow();
-    });
-
-    document.getElementById('button-3').addEventListener('click', function () {
-        const activeRow = document.querySelector('.active-row');
-        if (activeRow) {
-            activeRow.remove();
-            saveTableStateToHistory();
-            saveTableStateToSticky();
-        } else {
-            alert("Please select a row to remove.");
-        }
-    });
-    
     // Attach the initial events
     attachTabEventListeners();
-    attachSliderEvent();
+    // attachSliderEvent();
     attachRowClickEvents();
     attachAddGeoEvent(); // Attach initial event to existing buttons
 });
