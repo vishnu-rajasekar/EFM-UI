@@ -1,52 +1,46 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log("Page Loaded"); // To confirm when the document is loaded
-    const content = document.getElementById('content');
     const geometryContent = document.getElementById('geometry-content');
     const materialContent = document.getElementById('material-content');
     const loadContent = document.getElementById('load-content');
     const geotechnicContent = document.getElementById('geotechnic-content');
     const historyStack = []; // Stack to store history of table states for undo functionality
 
+    class Element {
+        constructor(name, geometries, thickness) {
+            this.name = name;
+            this.geometries = geometries;
+            this.thickness = thickness;
+        }
+    }
+
+    // Initialize elementsList with data from localStorage
+    let elementsList = getElementsFromLocalStorage();
+
+    // Listen for the 'elementsLoaded' event dispatched from Python
+    window.addEventListener('elementsLoaded', function () {
+        console.log("'elementsLoaded' event received");
+        // Re-initialize elementsList from localStorage
+        elementsList = getElementsFromLocalStorage();
+        console.log("elementsList loaded from localStorage:", elementsList);
+        // Rebuild the table
+        writeTableRow();
+    });
+  
     ///////////////////////////////////////////////////////////////////////////////////////////
     // SLIDER 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     // Get URL parameters for initial slider values
-    // const urlParams = new URLSearchParams(window.location.search);
     const sliderIds = ["slider1", "slider255"];
-
-    // // Initialize sliders with default values or from URL params
-    // sliderIds.forEach(function (id) {
-    //     const element = document.getElementById(id);
-    //     if (element) {
-    //         // Get initial value from URL parameters or default to 75
-    //         const initialValue = urlParams.get(id) || 2;
-    //         element.value = initialValue;
-    //         console.log(`Setting initial value for ${id}: ${initialValue}`);
-    //     } else {
-    //         console.error(`Slider with ID ${id} not found.`);
-    //     }
-    // });
-
-    // // Add event listeners for slider value changes
-    // sliderIds.forEach(function (id) {
-    //     const element = document.getElementById(id);
-    //     if (element) {
-    //         element.addEventListener('input', function () {
-    //             // When the slider changes, update the value in Rhino via the custom URI scheme
-    //             window.location.href = `sliderupdate:slider?${id}=${element.value}`;
-    //         });
-    //     }
-    // });
-
-    
+       
     sliderIds.forEach(function (id) {
         const element = document.getElementById(id);
         if (element) {
             // Retrieve stored value or set to default if not found
             let storedValue = localStorage.getItem(id);
             if (storedValue === null) {
-                storedValue = 95;  // Default value
+                storedValue = 50;  // Default value
                 localStorage.setItem(id, storedValue);  // Set the default value to localStorage
                 console.log(`Setting initial value for ${id} to default: ${storedValue}`);
             } else {
@@ -69,8 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = `sliderupdate:slider?${id}=${element.value}`;
             });
         }
-    });
-    
+    });    
     
     ///////////////////////////////////////////////////////////////////////////////////////////
     // TAB 
@@ -123,7 +116,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
     // Attach button events to add and remove rows
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     document.getElementById('button-1').addEventListener('click', function () {
         addTableRow();
     });
@@ -131,54 +128,46 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('button-3').addEventListener('click', function () {
         const activeRow = document.querySelector('.active-row');
         if (activeRow) {
+            // Find the index of the row being removed
+            const elementIndex = activeRow.dataset.elementIndex;
+            const element = elementsList[elementIndex]; // Get the element before removing
+            elementsList.splice(elementIndex, 1); // Remove the element from the elementsList array
+    
             activeRow.remove();
-            saveTableStateToHistory();
-            saveTableStateToSticky();
+            updateElementIndices(); // Update indices after removal
+            saveElementsToLocalStorage(); // Update local storage after removal
+    
+            // Notify Python of the deletion
+            window.location.href = `deleteelement:delete?name=${encodeURIComponent(element.name)}`;
         } else {
             alert("Please select a row to remove.");
         }
     });
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // WRITE TABLE
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    function writeTableRow() {
+        const tableBody = document.querySelector('#geometry-table tbody');
+        tableBody.innerHTML = ""; // Clear existing rows before writing new ones
+
+        if (elementsList && elementsList.length > 0) {
+            elementsList.forEach((element, index) => {
+                addTableRow(element.name, element.thickness, index);
+            });
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
-    // TABLE HISTORY
+    // TABLE 
     ///////////////////////////////////////////////////////////////////////////////////////////
-    
-    // function saveTableStateToHistory() {
-    //     const rows = Array.from(document.querySelectorAll('#geometry-table tbody tr'));
-    //     const tableState = rows.map(row => {
-    //         const nameInput = row.querySelector('.geometry-name').value;
-    //         const thicknessInput = row.querySelector('.geometry-thickness').value;
-    //         return { name: nameInput, thickness: thicknessInput };
-    //     });
-    //     historyStack.push(JSON.stringify(tableState));
-    // }
 
-    // function saveTableStateToSticky() {
-    //     const rows = Array.from(document.querySelectorAll('#geometry-table tbody tr'));
-    //     const tableState = rows.map(row => {
-    //         const nameInput = row.querySelector('.geometry-name').value;
-    //         const thicknessInput = row.querySelector('.geometry-thickness').value;
-    //         return { name: nameInput, thickness: thicknessInput };
-    //     });
-    //     window.location.href = `savetable:state?${JSON.stringify(tableState)}`;
-    // }
-
-    // function loadTableStateFromSticky(stateString) {
-    //     const tableState = JSON.parse(stateString);
-    //     const tableBody = document.querySelector('#geometry-table tbody');
-    //     tableBody.innerHTML = ""; // Clear existing rows
-    //     tableState.forEach(rowData => {
-    //         addTableRow(rowData.name, rowData.thickness);
-    //     });
-    // }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // TABLE HISTORY
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    function addTableRow(name = "", thickness = "") {
+    // Modified addTableRow function to use the new save function
+    function addTableRow(name = "", thickness = "", elementIndex = null) {
         const tableBody = document.querySelector('#geometry-table tbody');
         const newRow = tableBody.insertRow();
+
         let nameCell = newRow.insertCell(0);
         let thicknessCell = newRow.insertCell(1);
         let buttonCell = newRow.insertCell(2);
@@ -187,35 +176,107 @@ document.addEventListener('DOMContentLoaded', function () {
         thicknessCell.innerHTML = `<input type="number" value="${thickness}" class="geometry-thickness" placeholder="Enter thickness" />`;
         buttonCell.innerHTML = `<button class="add-geo">Add Geo</button>`;
 
+        let element;
+
+        if (elementIndex !== null && elementsList[elementIndex]) {
+            // Use existing element
+            element = elementsList[elementIndex];
+        } else {
+            // Create new element
+            element = new Element(name, [], thickness);
+            elementsList.push(element);
+            elementIndex = elementsList.length - 1;
+        }
+
+        // Store element index in row's data attribute
+        newRow.dataset.elementIndex = elementIndex;
+
+        // Add event listeners to input fields to update element
+        const nameInput = nameCell.querySelector('.geometry-name');
+        const thicknessInput = thicknessCell.querySelector('.geometry-thickness');
+
+        nameInput.addEventListener('change', function () {
+            const updatedName = nameInput.value;
+            element.name = updatedName;
+            saveElementsToLocalStorage();
+        });
+
+        thicknessInput.addEventListener('change', function () {
+            const updatedThickness = thicknessInput.value;
+            element.thickness = updatedThickness;
+            saveElementsToLocalStorage();
+        });
+
+        // Add click event for the Add Geo button
         buttonCell.querySelector('.add-geo').addEventListener('click', function () {
-            const updatedName = newRow.querySelector('.geometry-name').value;
-            const updatedThickness = newRow.querySelector('.geometry-thickness').value;
-            if (updatedName && !isNaN(updatedThickness)) {
-                window.location.href = `geometryupdate:geo?${updatedName},${updatedThickness}`;
+            const geometryName = element.name;
+            const geometryThickness = element.thickness;
+
+            if (geometryName && !isNaN(geometryThickness)) {
+                console.log('Element Selected for Geo:', element);
+
+                // Save the updated elements list to local storage
+                saveElementsToLocalStorage();
+
+                // Notify Python of the new geometry (if required)
+                window.location.href = `geometryupdate:geo?${encodeURIComponent(geometryName)},${geometryThickness}`;
             } else {
                 alert("Please fill all fields to create an element.");
             }
-            saveTableStateToSticky(); // Save state to sticky after clicking Add Geo
         });
 
         attachRowClickEvents();
-        attachAddGeoEvent(); // Ensure new row buttons have event listeners attached
-        saveTableStateToHistory();
-        saveTableStateToSticky();
+        saveElementsToLocalStorage(); // Save state after adding a new row
+        // No need to notify Python
     }
 
-    function attachAddGeoEvent() {
-        document.querySelectorAll('.add-geo').forEach(button => {
-            button.addEventListener('click', function () {
-                const geometryName = button.closest('tr').querySelector('.geometry-name').value;
-                const geometryThickness = parseFloat(button.closest('tr').querySelector('.geometry-thickness').value);
-
-                if (geometryName && !isNaN(geometryThickness)) {
-                    window.location.href = `geometryupdate:geo?${geometryName},${geometryThickness}`;
-                } else {
-                    alert("Please fill all fields to create an element.");
-                }
+    function attachRowClickEvents() {
+        document.querySelectorAll('#geometry-table tbody tr').forEach(row => {
+            row.addEventListener('click', function () {
+                document.querySelectorAll('#geometry-table tbody tr').forEach(r => r.classList.remove('active-row'));
+                row.classList.add('active-row');
             });
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // LOCAL STORAGE HANDLING
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    function saveElementsToLocalStorage() {
+        localStorage.setItem('elementsList', JSON.stringify(elementsList));
+    }
+
+    // Modify getElementsFromLocalStorage function
+    function getElementsFromLocalStorage() {
+        const storedElements = localStorage.getItem('elementsList');
+        if (storedElements) {
+            try {
+                const elementsArray = JSON.parse(storedElements);
+                // Convert plain objects to Element instances
+                const elementsInstances = elementsArray.map(elementData => {
+                    return new Element(elementData.name, elementData.geometries, elementData.thickness);
+                });
+                console.log("Elements loaded from localStorage:", elementsInstances);
+                return elementsInstances;
+            } catch (e) {
+                console.error("Error parsing elements from localStorage:", e);
+                return [];
+            }
+        } else {
+            console.log("No elements in localStorage");
+            return [];
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    // UNDO ACTIONS HANDLING
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
+    function updateElementIndices() {
+        // Update element indices stored in row data attributes after any changes
+        document.querySelectorAll('#geometry-table tbody tr').forEach((row, index) => {
+            row.dataset.elementIndex = index;
         });
     }
 
@@ -228,15 +289,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    function attachRowClickEvents() {
-        document.querySelectorAll('#geometry-table tbody tr').forEach(row => {
-            row.addEventListener('click', function () {
-                document.querySelectorAll('#geometry-table tbody tr').forEach(r => r.classList.remove('active-row'));
-                row.classList.add('active-row');
-            });
-        });
-    }
-
     // Attach event listener for Ctrl + Z to undo the last action
     document.addEventListener('keydown', function (event) {
         if (event.ctrlKey && event.key === 'z') {
@@ -247,7 +299,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Attach the initial events
     attachTabEventListeners();
+    // Write table rows from local storage when the page is loaded
+    writeTableRow();
+
     // attachSliderEvent();
-    attachRowClickEvents();
-    attachAddGeoEvent(); // Attach initial event to existing buttons
+    // attachRowClickEvents();
+    // attachAddGeoEvent(); // Attach initial event to existing buttons
+
+    // Load the table state when the page is loaded
+    // loadTableStateFromSession();
 });
