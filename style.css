@@ -63,6 +63,10 @@ nav {
     flex-shrink: 1;
 }
 
+/*////////////////////////////////////////////////////////////////////////////////////////
+//   Geometry tab 
+////////////////////////////////////////////////////////////////////////////////////////*/
+
 .button-section {
     margin-top: 5px;
     display: flex;
@@ -103,10 +107,10 @@ th, td {
 }
 
 button.add-geo {
-    background: #ffffff;
-    border: 1px solid #000000;
+    background: #000000;
+    color: #ffffff;
     border-radius: 5px;
-    padding: 5px;
+    /* padding: 5px; */
     cursor: pointer;
 }
 
@@ -117,4 +121,148 @@ button.add-geo {
 
 .active-row {
     background-color: #dfdfdf;
+}
+
+/*////////////////////////////////////////////////////////////////////////////////////////
+//   Material tab 
+////////////////////////////////////////////////////////////////////////////////////////*/
+
+.material-manager-section {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.material-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.material-header h3 {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: lighter;
+}
+
+#add-material-button {
+    background: #000000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#add-material-button:hover {
+    background: #ffffff;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+}
+
+/* Style each material container section */
+.material-container {
+    margin-top: 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    max-width: 500px; /* Set maximum width for each container */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header section within each material container */
+.material-header {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between elements */
+}
+
+.material-title-input {
+    border: none;
+    background: none;
+    font-size: 1.2em;
+    font-weight: bold;
+    width: auto;
+    max-width: 200px; /* Limit the max width */
+    color: #333;
+    margin-right: 5px;
+}
+
+.material-title-input:focus {
+    outline: 1px solid #aaa;
+    background-color: #ffffff;
+    width: 100%; /* Optional: set a specific width on focus */
+    max-width: 200px; /* Ensures input doesn’t exceed max width */
+}
+
+.material-select {
+    padding: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 150px; /* Ensures dropdown is not too narrow */
+}
+
+.material-content {
+    padding: 10px;
+    border: 1px solid #dcdcdc;
+    background-color: #ffffff;
+    display: none; /* Initially hidden, shown when expanded */
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* Style each input field inside the material container */
+.material-input {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+    padding: 5px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* Delete button styling for each material section */
+.delete-button {
+    background: #000000;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+.delete-button:hover {
+    background-color: #000000;
+}
+
+.toggle-button {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px;
+}
+
+/* Additional layout for individual input sections within material content */
+.input-container {
+    margin-bottom: 10px;
+}
+
+.material-input-label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+    color: #333;
 }

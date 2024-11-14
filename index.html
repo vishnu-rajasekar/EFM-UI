@@ -33,7 +33,7 @@
 
         <!-- Content Section -->
         <section class="content" id="content">
-            <!-- Initial Geometry Content -->
+            <!-- Geometry Tab -->
             <div id="geometry-content" >
                 <p>Create layers to add geometry here.</p>
                 <section class="button-section">
@@ -63,9 +63,20 @@
                     </table>
                 </section>
             </div>
+            <!-- Material Tab -->
             <div id="material-content" style="display: none;">
-                <p>Material settings go here.</p>
+                <input type="file" id="excel-file-input" accept=".xlsx, .xls" />
+                <section class="material-manager-section">
+                    <div class="material-header">
+                        <h3>Material Manager</h3>
+                        <button id="add-material-button">+ Add Material</button>
+                    </div>
+                    <div id="material-list">
+                        <!-- Material sections will be dynamically added here -->
+                    </div>
+                </section>
             </div>
+            
             <!-- <div id="load-content" style="display: none;">
                 <p>Q
                     <input type="range" min="0" max="100" class="slider" id="slider1">
@@ -91,6 +102,8 @@
     </main>
 
     <script src="script.js"></script> <!-- Link to external JavaScript file -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
 </body>
 
 </html
